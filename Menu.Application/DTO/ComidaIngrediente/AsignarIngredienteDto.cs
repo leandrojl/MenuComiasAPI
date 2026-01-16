@@ -2,5 +2,8 @@
 {
     public class AsignarIngredienteDto
     {
+        public int ComidaId { get; set; }
+        public int IngredienteId { get; set; }
+        public string? Descripcion { get; set; }
     }
 }

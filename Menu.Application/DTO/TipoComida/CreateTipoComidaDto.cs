@@ -2,5 +2,6 @@
 {
     public class CreateTipoComidaDto
     {
+        public string Nombre { get; set; } = null!;
     }
 }

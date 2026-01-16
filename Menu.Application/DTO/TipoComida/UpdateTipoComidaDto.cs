@@ -2,5 +2,6 @@
 {
     public class UpdateTipoComidaDto
     {
+        public string Nombre { get; set; } = null!;
     }
 }
