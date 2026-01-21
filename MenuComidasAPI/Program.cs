@@ -2,6 +2,8 @@ using Menu.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Menu.Application.Services; // Ajusta el namespace según donde estén definidos los tipos
 using Menu.Application.Interfaces;
+using Menu.Domain.Interfaces;
+using Menu.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,7 @@ builder.Services.AddScoped<ITipoComidaService, TipoComidaService>();
 builder.Services.AddScoped<IIngredienteService, IngredienteService>();
 builder.Services.AddScoped<IComidaService, ComidaService>();
 builder.Services.AddScoped<IComidaIngredienteService, ComidaIngredienteService>();
+builder.Services.AddScoped<ITipoComidaRepository, TipoComidaRepository>();
 
 var app = builder.Build();
 

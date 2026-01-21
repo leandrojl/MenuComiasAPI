@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Menu.Domain.Entities
 {
-    public class Comida
+    public class Comida : IEntity
     {
         public int Id { get; set; }
         public string Nombre { get; set; } = null!;

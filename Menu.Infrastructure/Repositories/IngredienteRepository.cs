@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Menu.Infrastructure.Repositories
 {
-    internal class IngredienteRepository
+    public class IngredienteRepository
     {
     }
 }
