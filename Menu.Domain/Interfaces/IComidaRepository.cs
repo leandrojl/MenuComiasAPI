@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Menu.Domain.Interfaces
 {
-    internal interface IComidaRepository
+    public interface IComidaRepository
     {
     }
 }
