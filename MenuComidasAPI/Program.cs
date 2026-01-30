@@ -1,6 +1,6 @@
 using Menu.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Menu.Application.Services; // Ajusta el namespace según donde estén definidos los tipos
+using Menu.Application.Services; // Ajusta el namespace segï¿½n donde estï¿½n definidos los tipos
 using Menu.Application.Interfaces;
 using Menu.Domain.Interfaces;
 using Menu.Infrastructure.Repositories;
@@ -20,6 +20,10 @@ builder.Services.AddScoped<IIngredienteService, IngredienteService>();
 builder.Services.AddScoped<IComidaService, ComidaService>();
 builder.Services.AddScoped<IComidaIngredienteService, ComidaIngredienteService>();
 builder.Services.AddScoped<ITipoComidaRepository, TipoComidaRepository>();
+builder.Services.AddScoped<IComidaRepository, ComidaRepository>();
+builder.Services.AddScoped<IIngredienteRepository, IngredienteRepository>();
+builder.Services.AddScoped<IComidaIngredienteRepository, ComidaIngredienteRepository>();
+
 
 var app = builder.Build();
 

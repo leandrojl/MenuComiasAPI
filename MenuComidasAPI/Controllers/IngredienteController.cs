@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿using Menu.Application.Interfaces;
+using Menu.Application.DTO.Ingrediente;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MenuComidasAPI.Controllers
 {
@@ -8,36 +8,104 @@ namespace MenuComidasAPI.Controllers
     [ApiController]
     public class IngredienteController : ControllerBase
     {
-        // GET: api/<IngredienteController>
+        private readonly IIngredienteService _ingredienteService;
+
+        public IngredienteController(IIngredienteService ingredienteService)
+        {
+            _ingredienteService = ingredienteService;
+        }
+
+        // GET: api/Ingrediente
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<IEnumerable<IngredienteDto>>> GetAll()
         {
-            return new string[] { "value1", "value2" };
+            var ingredientes = await _ingredienteService.GetAllAsync();
+            return Ok(ingredientes);
         }
 
-        // GET api/<IngredienteController>/5
+        // GET: api/Ingrediente/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<IngredienteDto>> GetById(int id)
         {
-            return "value";
+            var ingrediente = await _ingredienteService.GetByIdAsync(id);
+            
+            if (ingrediente == null)
+                return NotFound();
+            
+            return Ok(ingrediente);
         }
 
-        // POST api/<IngredienteController>
+        // GET: api/Ingrediente/5/comidas
+        [HttpGet("{id}/comidas")]
+        public async Task<ActionResult<IngredienteWithComidasDto>> GetByIdWithComidas(int id)
+        {
+            var ingrediente = await _ingredienteService.GetByIdWithComidasAsync(id);
+            
+            if (ingrediente == null)
+                return NotFound();
+            
+            return Ok(ingrediente);
+        }
+
+        // GET: api/Ingrediente/buscar?nombre=tomate
+        [HttpGet("buscar")]
+        public async Task<ActionResult<IEnumerable<IngredienteDto>>> SearchByNombre([FromQuery] string nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre))
+                return BadRequest("El parámetro 'nombre' es requerido.");
+            
+            var ingredientes = await _ingredienteService.SearchByNombreAsync(nombre);
+            return Ok(ingredientes);
+        }
+
+        // POST: api/Ingrediente
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<IngredienteDto>> Create([FromBody] CreateIngredienteDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var ingredienteCreado = await _ingredienteService.CreateAsync(dto);
+            
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = ingredienteCreado.Id },
+                ingredienteCreado
+            );
         }
 
-        // PUT api/<IngredienteController>/5
+        // PUT: api/Ingrediente/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateIngredienteDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var existe = await _ingredienteService.ExistsAsync(id);
+            if (!existe)
+                return NotFound();
+            
+            await _ingredienteService.UpdateAsync(id, dto);
+            
+            return NoContent();
         }
 
-        // DELETE api/<IngredienteController>/5
+        // DELETE: api/Ingrediente/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            var existe = await _ingredienteService.ExistsAsync(id);
+            if (!existe)
+                return NotFound();
+            
+            // Verificar si está siendo usado en alguna comida
+            var tieneComidas = await _ingredienteService.TieneComidasAsync(id);
+            if (tieneComidas)
+                return BadRequest("No se puede eliminar el ingrediente porque está siendo usado en una o más comidas.");
+            
+            await _ingredienteService.DeleteAsync(id);
+            
+            return NoContent();
         }
     }
 }

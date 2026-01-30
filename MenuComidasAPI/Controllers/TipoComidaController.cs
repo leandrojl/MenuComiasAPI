@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿using Menu.Application.Interfaces;
+using Menu.Application.DTO.TipoComida;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MenuComidasAPI.Controllers
 {
@@ -8,36 +8,93 @@ namespace MenuComidasAPI.Controllers
     [ApiController]
     public class TipoComidaController : ControllerBase
     {
-        // GET: api/<TipoComidaController>
+        private readonly ITipoComidaService _tipoComidaService;
+
+        public TipoComidaController(ITipoComidaService tipoComidaService)
+        {
+            _tipoComidaService = tipoComidaService;
+        }
+
+        // GET: api/TipoComida
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<IEnumerable<TipoComidaDto>>> GetAll()
         {
-            return new string[] { "value1", "value2" };
+            var tiposComida = await _tipoComidaService.GetAllAsync();
+            return Ok(tiposComida);
         }
 
-        // GET api/<TipoComidaController>/5
+        // GET: api/TipoComida/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<TipoComidaDto>> GetById(int id)
         {
-            return "value";
+            var tipoComida = await _tipoComidaService.GetByIdAsync(id);
+            
+            if (tipoComida == null)
+                return NotFound();
+            
+            return Ok(tipoComida);
         }
 
-        // POST api/<TipoComidaController>
+        // GET: api/TipoComida/5/comidas
+        [HttpGet("{id}/comidas")]
+        public async Task<ActionResult<TipoComidaDto>> GetByIdWithComidas(int id)
+        {
+            var tipoComida = await _tipoComidaService.GetByIdWithComidasAsync(id);
+            
+            if (tipoComida == null)
+                return NotFound();
+            
+            return Ok(tipoComida);
+        }
+
+        // POST: api/TipoComida
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<TipoComidaDto>> Create([FromBody] CreateTipoComidaDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var tipoComidaCreado = await _tipoComidaService.CreateAsync(dto);
+            
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = tipoComidaCreado.Id },
+                tipoComidaCreado
+            );
         }
 
-        // PUT api/<TipoComidaController>/5
+        // PUT: api/TipoComida/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateTipoComidaDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var existe = await _tipoComidaService.ExistsAsync(id);
+            if (!existe)
+                return NotFound();
+            
+            await _tipoComidaService.UpdateAsync(id, dto);
+            
+            return NoContent();
         }
 
-        // DELETE api/<TipoComidaController>/5
+        // DELETE: api/TipoComida/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            var existe = await _tipoComidaService.ExistsAsync(id);
+            if (!existe)
+                return NotFound();
+            
+            // Opcional: Verificar si tiene comidas asociadas antes de eliminar
+            var tieneComidas = await _tipoComidaService.TieneComidasAsync(id);
+            if (tieneComidas)
+                return BadRequest("No se puede eliminar el tipo de comida porque tiene comidas asociadas.");
+            
+            await _tipoComidaService.DeleteAsync(id);
+            
+            return NoContent();
         }
     }
 }
