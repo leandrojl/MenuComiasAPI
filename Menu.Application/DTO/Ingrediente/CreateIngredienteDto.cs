@@ -1,7 +1,11 @@
-﻿namespace Menu.Application.DTO.Ingrediente
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Menu.Application.DTO.Ingrediente
 {
     public class CreateIngredienteDto
     {
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 100 caracteres")]
         public string Nombre { get; set; } = null!;
     }
 }

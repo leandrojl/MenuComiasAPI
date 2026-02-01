@@ -1,6 +1,6 @@
 using Menu.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Menu.Application.Services; // Ajusta el namespace seg�n donde est�n definidos los tipos
+using Menu.Application.Services;
 using Menu.Application.Interfaces;
 using Menu.Domain.Interfaces;
 using Menu.Infrastructure.Repositories;
